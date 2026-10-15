@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="mn"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Голч бодогч</title><link rel="stylesheet" href="css/tools.css"></head><body>
+<h1>Голч бодогч</h1>
+<div class="box"><p>Хичээл бүрийн нэр, кредит, голчийн оноог оруулаад «Тооцоолох» товчийг дарна. Кредит нь 0–5 хүртэлх бүхэл тоо, голчийн оноо нь 0–4 хүртэлх бутархай тоо байж болно. Голч = Σ(кредит × оноо) ÷ нийт кредит.</p></div>
+<div class="box">
+<table>
+<thead><tr><th>Хичээлийн нэр</th><th>Кредит (0–5)</th><th>Голчийн оноо (0–4)</th><th></th></tr></thead>
+<tbody id="rows"></tbody></table>
+<div class="btns"><button type="button" id="add">Мөр нэмэх</button><button type="button" id="calc">Тооцоолох</button><button type="button" id="clr" class="grey">Цэвэрлэх</button></div>
+<div class="err" id="err" role="alert"></div>
+</div>
+<div class="box result">
+<span class="tag" id="tag">Жишээ үр дүн</span>
+<p>Нийт кредит: <b id="cr">15</b></p>
+<p>Голч: <b id="gpa">3.47</b></p>
+<small id="note">Энэ нь жишээ тоо. «Тооцоолох» дарахад таны оруулсан тоогоор бодогдоно.</small>
+</div>
+<script>
+const ex=[["Математик",3,3.5],["Программчлал",4,4],["Англи хэл",2,3],["Физик",3,2.5],["Вэб хөгжүүлэлт",3,4]];
+const rows=document.getElementById("rows"),err=document.getElementById("err");
+function row(n="",c="",g=""){
+ const tr=document.createElement("tr");
+ tr.innerHTML='<td><input class="n" type="text"></td><td><input class="c" type="number" min="0" max="5" step="1"></td><td><input class="g" type="number" min="0" max="4" step="0.1"></td><td class="x"><button type="button" class="rm">Устгах</button></td>';
+ tr.querySelector(".n").value=n;tr.querySelector(".c").value=c;tr.querySelector(".g").value=g;
+ tr.querySelector(".rm").onclick=()=>{tr.remove();if(!rows.children.length)row()};
+ rows.appendChild(tr)}
+function calc(){
+ let t=0,s=0,bad=0,used=0;err.textContent="";
+ rows.querySelectorAll("tr").forEach(tr=>{
+  const ci=tr.querySelector(".c"),gi=tr.querySelector(".g");
+  ci.classList.remove("bad");gi.classList.remove("bad");
+  if(ci.value===""&&gi.value==="")return;
+  const c=Number(ci.value),g=Number(gi.value);
+  const okC=ci.value!==""&&Number.isInteger(c)&&c>=0&&c<=5;
+  const okG=gi.value!==""&&g>=0&&g<=4;
+  if(!okC){ci.classList.add("bad");bad++}
+  if(!okG){gi.classList.add("bad");bad++}
+  if(okC&&okG){t+=c;s+=c*g;used++}});
+ if(bad){err.textContent="Кредит 0–5 хүртэлх бүхэл тоо, голчийн оноо 0–4 хүртэл байх ёстой. Улаанаар тэмдэглэсэн талбарыг засна уу."}
+ else if(!used){err.textContent="Хамгийн багадаа нэг хичээлийн кредит, оноог оруулна уу."}
+ else if(!t){err.textContent="Нийт кредит 0 байна. Голч бодогдохгүй."}
+ if(bad||!t)return;
+ document.getElementById("cr").textContent=t;
+ document.getElementById("gpa").textContent=(s/t).toFixed(2);
+ document.getElementById("tag").textContent="Үр дүн";
+ document.getElementById("note").textContent="Таны оруулсан тоогоор бодогдлоо."}
+document.getElementById("add").onclick=()=>row();
+document.getElementById("calc").onclick=calc;
+document.getElementById("clr").onclick=()=>{
+ rows.innerHTML="";row();err.textContent="";
+ document.getElementById("cr").textContent="0";
+ document.getElementById("gpa").textContent="–";
+ document.getElementById("tag").textContent="Үр дүн";
+ document.getElementById("note").textContent="Хүснэгт цэвэрлэгдлээ.";};
+ex.forEach(x=>row(...x));
+</script></body></html>

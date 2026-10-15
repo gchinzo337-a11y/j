@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="mn"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Хичээлийн хуваарь</title><link rel="stylesheet" href="css/tools.css"></head><body>
+<h1>Хичээлийн хуваарь</h1>
+<div class="scroll"><table>
+<thead><tr><th>Цаг</th><th>Даваа</th><th>Мягмар</th><th>Лхагва</th><th>Пүрэв</th><th>Баасан</th></tr></thead>
+<tbody id="body"></tbody></table></div>
+
+<form class="box form" id="f">
+<label>Хичээлийн нэр<input type="text" id="name" required></label>
+<label>Гараг<select id="day"><option value="0">Даваа</option><option value="1">Мягмар</option><option value="2">Лхагва</option><option value="3">Пүрэв</option><option value="4">Баасан</option></select></label>
+<label>Пар<select id="par"></select></label>
+<label>Өрөө<input type="text" id="room" required></label>
+<label>Багш<input type="text" id="teacher" required></label>
+<button type="submit">Хичээл нэмэх</button>
+</form>
+
+<script>
+const P=[["08:00","09:30"],["09:40","11:10"],["11:20","12:50"],["13:20","14:50"],["15:00","16:30"],["16:40","18:10"],["18:20","19:50"]];
+const B=["09:30–09:40","11:10–11:20","12:50–13:20","14:50–15:00","16:30–16:40","18:10–18:20"];
+let L=[
+{n:"Математик",d:0,p:0,r:"201",t:"Б. Болд"},{n:"Физик",d:2,p:0,r:"210",t:"Г. Тэмүүлэн"},
+{n:"Англи хэл",d:1,p:1,r:"112",t:"С. Анар"},{n:"Түүх",d:4,p:2,r:"105",t:"Ж. Ганаа"},
+{n:"Программчлал",d:0,p:3,r:"305",t:"Д. Оюун"},{n:"Вэб хөгжүүлэлт",d:3,p:4,r:"306",t:"Н. Сарнай"}];
+const body=document.getElementById("body"),par=document.getElementById("par");
+P.forEach((x,i)=>par.add(new Option(`${i+1}-р пар (${x[0]}–${x[1]})`,i)));
+function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e}
+function draw(){
+ body.innerHTML="";
+ P.forEach((x,i)=>{
+  const tr=el("tr"),th=el("td","time",`${i+1}-р пар`);
+  th.appendChild(el("small","",`${x[0]}–${x[1]}`));tr.appendChild(th);
+  for(let d=0;d<5;d++){
+   const td=el("td");
+   L.forEach((l,k)=>{
+    if(l.d!==d||l.p!==i)return;
+    const c=el("div","lesson");
+    c.appendChild(el("b","",l.n));
+    c.append(`${x[0]}–${x[1]}`,document.createElement("br"),`Өрөө ${l.r}`,document.createElement("br"),l.t);
+    const b=el("button","del","×");b.type="button";b.title="Устгах";b.setAttribute("aria-label",`${l.n} хичээлийг устгах`);
+    b.onclick=()=>{L.splice(k,1);draw()};
+    c.appendChild(b);td.appendChild(c)});
+   tr.appendChild(td)}
+  body.appendChild(tr);
+  if(i<6){const br=el("tr","break"),td=el("td","",`Завсарлага ${B[i]}`);td.colSpan=6;br.appendChild(td);body.appendChild(br)}
+ })}
+document.getElementById("f").addEventListener("submit",e=>{
+ e.preventDefault();
+ const v=id=>document.getElementById(id).value.trim();
+ L.push({n:v("name"),d:+v("day"),p:+v("par"),r:v("room"),t:v("teacher")});
+ draw();e.target.reset()});
+draw();
+</script></body></html>
